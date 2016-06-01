@@ -8,6 +8,12 @@ const defaults = {
   extensions: []
 }
 
+function getConfig(options) {
+  const opts = { ...defaults, ...options }
+  opts.extensions = opts.extensions.map(ext => ext.replace('.', ''))
+  return opts
+}
+
 export default function({ types: t }) {
   return {
     visitor: {
@@ -16,11 +22,7 @@ export default function({ types: t }) {
 
         if (name !== 'require' || !node || !t.isStringLiteral(node)) return
 
-        config = config || (function() {
-          const opts = { ...defaults, ...state.opts }
-          opts.extensions = opts.extensions.map(ext => ext.replace('.', ''))
-          return opts
-        })()
+        config = config || getConfig(state.opts)
 
         const ext = node.value.split('.').slice(-1).join('')
         if (config.extensions.indexOf(ext) === -1) return
